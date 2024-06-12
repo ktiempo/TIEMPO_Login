@@ -1,10 +1,11 @@
-import { Button, Container, Grid, Paper, TextField, Typography, } from '@mui/material'
+import { Button, Container, Grid, Paper, TextField, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
+import { Link, useNavigate} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
-    Paper: {
+    paper: {
         padding: theme.spacing(4),
         marginTop: theme.spacing(4),
     },
@@ -31,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login() {
     const classes = useStyles();
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
@@ -39,9 +41,8 @@ export default function Login() {
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
         if (!validateEmail(e.target.value)) {
-            setEmailError('Please enter valid email')
-        }
-        else {
+            setEmailError('Please enter a valid email')
+        } else {
             setEmailError('')
         }
     };
@@ -52,22 +53,34 @@ export default function Login() {
     }
 
     const handlePasswordChange = (e) => {
-        setPasswordError(e.target.value)
+        setPassword(e.target.value)
         if (e.target.value.length < 6) {
-            setPasswordError('Password must be atleast 6 characters')
-        }
-        else {
+            setPasswordError('Password must be at least 6 characters')
+        } else {
             setPasswordError('');
         }
     };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (email && password && !Boolean(emailError) && !Boolean(passwordError)) {
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+                alert(error.message);
+            } else {
+                alert('Login successful');
+                navigate('/dashboard');
+            }
+        }
+    };
+
     return (
         <Container maxWidth='xs'>
             <Paper className={classes.paper} elevation={3}>
-                <img className={classes.logo} src='/vite.svg' alt='logo' />
                 <Typography className={classes.title} variant='h4' align='center' gutterBottom>
                     Login
                 </Typography>
-                <form className={classes.form}>
+                <form className={classes.form} onSubmit={handleSubmit}>
                     <TextField
                         label='Email'
                         variant='outlined'
@@ -78,22 +91,23 @@ export default function Login() {
                         helperText={emailError}
                     />
                     <TextField
-                        label='password'
+                        label='Password'
                         variant='outlined'
                         fullWidth
+                        type='password'
                         value={password}
                         onChange={handlePasswordChange}
                         error={Boolean(passwordError)}
                         helperText={passwordError}
                     />
-                    <Button className={classes.submit} variant='contained' color='primary' type='submit' fullWidth >
-                        Login{""}
+                    <Button className={classes.submit} variant='contained' color='primary' type='submit' fullWidth>
+                        Login
                     </Button>
                 </form>
                 <Grid container justifyContent={"center"}>
                     <Grid item>
                         <Link to='/signup' className={classes.link}>
-                            Don't have an account? signup
+                            Don't have an account? Sign up
                         </Link>
                     </Grid>
                 </Grid>

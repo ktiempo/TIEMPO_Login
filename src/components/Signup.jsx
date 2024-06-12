@@ -1,10 +1,11 @@
-import { Button, Container, Grid, Paper, TextField, Typography, } from '@mui/material'
+import { Button, Container, Grid, Paper, TextField, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const useStyles = makeStyles((theme) => ({
-    Paper: {
+    paper: {
         padding: theme.spacing(4),
         marginTop: theme.spacing(4),
     },
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         height: 100,
         marginBottom: theme.spacing(2)
     }
-}))
+}));
 
 export default function Signup() {
     const classes = useStyles();
@@ -41,9 +42,8 @@ export default function Signup() {
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
         if (!validateEmail(e.target.value)) {
-            setEmailError('Please enter valid email')
-        }
-        else {
+            setEmailError('Please enter a valid email')
+        } else {
             setEmailError('')
         }
     };
@@ -51,14 +51,13 @@ export default function Signup() {
     const validateEmail = (email) => {
         const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
         return emailRegex.test(email)
-    }
+    };
 
     const handlePasswordChange = (e) => {
-        setPasswordError(e.target.value)
+        setPassword(e.target.value)
         if (e.target.value.length < 6) {
-            setPasswordError('Password must be atleast 6 characters')
-        }
-        else {
+            setPasswordError('Password must be at least 6 characters')
+        } else {
             setPasswordError('');
         }
     };
@@ -66,26 +65,24 @@ export default function Signup() {
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value)
         if (e.target.value.length < 6) {
-            setConfirmPasswordError('Password must be atleast 6 characters')
-        }
-        else if (e.target.value !== password) {
-            setConfirmPasswordError('Password do not match')
-        }
-        else {
+            setConfirmPasswordError('Password must be at least 6 characters')
+        } else if (e.target.value !== password) {
+            setConfirmPasswordError('Passwords do not match')
+        } else {
             setConfirmPasswordError('')
         }
-    }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(email && password && confirmpassword && !Boolean(emailError) && !Boolean(passwordError) && !Boolean(confirmpasswordError)){
-            alert('Account created Successfully')
+        if (email && password && confirmpassword && !Boolean(emailError) && !Boolean(passwordError) && !Boolean(confirmpasswordError)) {
+            alert('Account created Successfully');
         }
-    }
+    };
+
     return (
         <Container maxWidth='xs'>
             <Paper className={classes.paper} elevation={3}>
-                <img className={classes.logo} src='/vite.svg' alt='logo' />
                 <Typography className={classes.title} variant='h4' align='center' gutterBottom>
                     Signup
                 </Typography>
@@ -103,26 +100,27 @@ export default function Signup() {
                         label='Password'
                         variant='outlined'
                         fullWidth
+                        type='password'
                         value={password}
                         onChange={handlePasswordChange}
-                        error={Boolean(password)}
-                        helperText={password}
+                        error={Boolean(passwordError)}
+                        helperText={passwordError}
                     />
                     <TextField
                         label='Confirm Password'
                         variant='outlined'
                         fullWidth
+                        type='password'
                         value={confirmpassword}
                         onChange={handleConfirmPasswordChange}
                         error={Boolean(confirmpasswordError)}
                         helperText={confirmpasswordError}
                     />
-                    <Button className={classes.submit} variant='contained' color='primary' type='submit' fullWidth >
-                        Signup{""}
+                    <Button className={classes.submit} variant='contained' color='primary' type='submit' fullWidth>
+                        Signup
                     </Button>
                 </form>
             </Paper>
         </Container>
-    )
+    );
 }
-
